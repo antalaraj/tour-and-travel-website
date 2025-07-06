@@ -159,7 +159,7 @@ tour-and-travel-website/
 
 ### Booking Module
 
-![Booking Module](SS/User/Home Page.png)
+![Booking Module](SS/User/Home_Page.png)
 
 ### Admin Dashboard
 
