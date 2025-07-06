@@ -151,6 +151,29 @@ tour-and-travel-website/
 - **Based on modern software design principles** (PEP8, BEM, MVC)
 
 ---
+## 👀 Screenshots
+
+### Home Page
+
+![Home Page]()
+
+### Booking Module
+
+![Booking Module](C:\Users\i\OneDrive\Pictures\Sample Image\SS\User\Home Page.png)
+
+### Admin Dashboard
+
+![Admin Dashboard](screenshots/admin_dashboard.png)
+
+### Guide Profiles
+
+![Guide Profiles](screenshots/guides.png)
+
+### Review System
+
+![Reviews](screenshots/reviews.png)
+
+---
 
 ## 👥 Contributor
 
