@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Register</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .register-container {
+            max-width: 500px;
+            width: 100%;
+            padding: 20px;
+        }
+
+        .register-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            transition: transform 0.3s ease;
+        }
+
+        .register-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .register-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .register-header h2 {
+            color: #2c3e50;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .register-header p {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        .form-floating {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-floating input,
+        .form-floating textarea {
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            padding: 1rem 0.75rem;
+            height: auto;
+            transition: all 0.3s ease;
+        }
+
+        .form-floating input:focus,
+        .form-floating textarea:focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+        }
+
+        .form-floating label {
+            padding: 1rem 0.75rem;
+        }
+
+        .btn-register {
+            background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-register:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(13, 110, 253, 0.3);
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .login-link a {
+            color: #0d6efd;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .login-link a:hover {
+            color: #0a58ca;
+        }
+
+        .alert {
+            border-radius: 10px;
+            border: none;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .alert-warning {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .alert-info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .profile-picture-preview {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 1rem auto;
+            display: block;
+            border: 3px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+
+        .profile-picture-preview:hover {
+            border-color: #0d6efd;
+            transform: scale(1.05);
+        }
+
+        .form-control[type="file"] {
+            padding: 0.5rem;
+            border-radius: 10px;
+            border: 2px dashed #e9ecef;
+            background-color: #f8f9fa;
+            transition: all 0.3s ease;
+        }
+
+        .form-control[type="file"]:hover {
+            border-color: #0d6efd;
+            background-color: #f1f3f5;
+        }
+
+        @media (max-width: 576px) {
+            .register-container {
+                padding: 15px;
+            }
+
+            .register-card {
+                padding: 1.5rem;
+            }
+        }
+
+        .form-progress {
+            margin-bottom: 2rem;
+        }
+
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            margin-bottom: 1rem;
+        }
+
+        .progress-steps::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: #e9ecef;
+            z-index: 1;
+        }
+
+        .progress-step {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: white;
+            border: 2px solid #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 2;
+            transition: all 0.3s ease;
+        }
+
+        .progress-step.active {
+            border-color: #0d6efd;
+            background-color: #0d6efd;
+            color: white;
+        }
+
+        .progress-step.completed {
+            border-color: #28a745;
+            background-color: #28a745;
+            color: white;
+        }
+
+        .step-content {
+            display: none;
+        }
+
+        .step-content.active {
+            display: block;
+        }
+
+        .step-navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1.5rem;
+        }
+
+        .btn-step {
+            padding: 0.5rem 1.5rem;
+            border-radius: 25px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-step:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-prev {
+            background-color: #f8f9fa;
+            color: #6c757d;
+            border: 1px solid #e9ecef;
+        }
+
+        .btn-next {
+            background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+            color: white;
+            border: none;
+        }
+
+        .terms-conditions {
+            margin: 1.5rem 0;
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        .terms-conditions a {
+            color: #0d6efd;
+            text-decoration: none;
+        }
+
+        .terms-conditions a:hover {
+            text-decoration: underline;
+        }
+
+        .form-check-input {
+            margin-right: 0.5rem;
+            cursor: pointer;
+        }
+
+        .form-check-label {
+            cursor: pointer;
+        }
+
+        .verification-code {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .verification-code input {
+            width: 40px;
+            height: 40px;
+            text-align: center;
+            font-size: 1.2rem;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .verification-code input:focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+        }
+
+        .resend-code {
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        .resend-code a {
+            color: #0d6efd;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .resend-code a:hover {
+            text-decoration: underline;
+        }
+
+        .timer {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        /* Remove password strength related styles */
+        .password-strength,
+        .password-hints {
+            display: none;
+        }
+
+        .form-floating.password-field {
+            margin-bottom: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <div class="register-card">
+            <div class="register-header">
+                <h2>Create Account</h2>
+                <p>Join us to start your journey</p>
+            </div>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <form method="POST" enctype="multipart/form-data" class="mt-3" id="registrationForm">
+                {% csrf_token %}
+                
+                <div class="form-progress">
+                    <div class="progress-steps">
+                        <div class="progress-step active" data-step="1">1</div>
+                        <div class="progress-step" data-step="2">2</div>
+                        <div class="progress-step" data-step="3">3</div>
+                    </div>
+                </div>
+
+                <!-- Step 1: Basic Information -->
+                <div class="step-content active" data-step="1">
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="username" name="username" placeholder="Username" required>
+                        <label for="username"><i class="fas fa-user me-2"></i>Username</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input type="email" class="form-control" id="email" name="email" placeholder="Email" required>
+                        <label for="email"><i class="fas fa-envelope me-2"></i>Email</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="phone" name="phone" placeholder="Phone Number" required>
+                        <label for="phone"><i class="fas fa-phone me-2"></i>Phone Number</label>
+                    </div>
+                </div>
+
+                <!-- Step 2: Password and Profile -->
+                <div class="step-content" data-step="2">
+                    <div class="form-floating password-field">
+                        <input type="password" class="form-control" id="password" name="password" placeholder="Password" required>
+                        <label for="password"><i class="fas fa-lock me-2"></i>Password</label>
+                        <i class="fas fa-eye password-toggle" onclick="togglePassword()"></i>
+                    </div>
+                    <div class="mb-3">
+                        <label for="img" class="form-label">
+                            <i class="fas fa-camera me-2"></i>Profile Picture
+                        </label>
+                        <input type="file" class="form-control" id="img" name="img" accept="image/*">
+                        <img id="preview" class="profile-picture-preview d-none" src="#" alt="Profile Preview">
+                    </div>
+                </div>
+
+                <!-- Step 3: Verification and Terms -->
+                <div class="step-content" data-step="3">
+                    <div class="verification-code">
+                        <input type="text" maxlength="1" pattern="[0-9]">
+                        <input type="text" maxlength="1" pattern="[0-9]">
+                        <input type="text" maxlength="1" pattern="[0-9]">
+                        <input type="text" maxlength="1" pattern="[0-9]">
+                    </div>
+                    <div class="resend-code">
+                        <span class="timer">Resend code in: <span id="countdown">60</span>s</span>
+                        <a href="#" id="resendLink" class="d-none">Resend code</a>
+                    </div>
+                    <div class="terms-conditions">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="terms" required>
+                            <label class="form-check-label" for="terms">
+                                I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step-navigation">
+                    <button type="button" class="btn btn-step btn-prev" style="display: none;">
+                        <i class="fas fa-arrow-left me-2"></i>Previous
+                    </button>
+                    <button type="button" class="btn btn-step btn-next">
+                        Next<i class="fas fa-arrow-right ms-2"></i>
+                    </button>
+                    <button type="submit" class="btn btn-step btn-next" style="display: none;">
+                        <i class="fas fa-check me-2"></i>Complete Registration
+                    </button>
+                </div>
+            </form>
+
+            <div class="login-link">
+                <a href="{% url 'login' %}">
+                    <i class="fas fa-sign-in-alt me-2"></i>Already have an account? Login
+                </a>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Preview profile picture
+        document.getElementById('img').addEventListener('change', function(e) {
+            const preview = document.getElementById('preview');
+            const file = e.target.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                preview.classList.remove('d-none');
+            }
+
+            if (file) {
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Multi-step form functionality
+        let currentStep = 1;
+        const totalSteps = 3;
+
+        function updateProgress() {
+            document.querySelectorAll('.progress-step').forEach(step => {
+                const stepNumber = parseInt(step.dataset.step);
+                step.classList.remove('active', 'completed');
+                if (stepNumber < currentStep) {
+                    step.classList.add('completed');
+                } else if (stepNumber === currentStep) {
+                    step.classList.add('active');
+                }
+            });
+
+            document.querySelectorAll('.step-content').forEach(content => {
+                content.classList.remove('active');
+                if (parseInt(content.dataset.step) === currentStep) {
+                    content.classList.add('active');
+                }
+            });
+
+            const prevBtn = document.querySelector('.btn-prev');
+            const nextBtn = document.querySelector('.btn-next');
+            const submitBtn = document.querySelector('button[type="submit"]');
+
+            prevBtn.style.display = currentStep === 1 ? 'none' : 'block';
+            nextBtn.style.display = currentStep === totalSteps ? 'none' : 'block';
+            submitBtn.style.display = currentStep === totalSteps ? 'block' : 'none';
+        }
+
+        document.querySelector('.btn-next').addEventListener('click', () => {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                updateProgress();
+            }
+        });
+
+        document.querySelector('.btn-prev').addEventListener('click', () => {
+            if (currentStep > 1) {
+                currentStep--;
+                updateProgress();
+            }
+        });
+
+        // Verification code input handling
+        const codeInputs = document.querySelectorAll('.verification-code input');
+        codeInputs.forEach((input, index) => {
+            input.addEventListener('input', function() {
+                if (this.value.length === 1) {
+                    if (index < codeInputs.length - 1) {
+                        codeInputs[index + 1].focus();
+                    }
+                }
+            });
+
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Backspace' && this.value.length === 0) {
+                    if (index > 0) {
+                        codeInputs[index - 1].focus();
+                    }
+                }
+            });
+        });
+
+        // Countdown timer
+        let timeLeft = 60;
+        const countdownElement = document.getElementById('countdown');
+        const resendLink = document.getElementById('resendLink');
+
+        function updateCountdown() {
+            countdownElement.textContent = timeLeft;
+            if (timeLeft > 0) {
+                timeLeft--;
+                setTimeout(updateCountdown, 1000);
+            } else {
+                resendLink.classList.remove('d-none');
+                countdownElement.parentElement.classList.add('d-none');
+            }
+        }
+
+        updateCountdown();
+
+        resendLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            timeLeft = 60;
+            resendLink.classList.add('d-none');
+            countdownElement.parentElement.classList.remove('d-none');
+            updateCountdown();
+        });
+
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const toggleIcon = document.querySelector('.password-toggle');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+            }
+        }
+    </script>
+</body>
+</html>

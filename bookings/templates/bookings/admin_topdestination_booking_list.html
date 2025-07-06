@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid py-5">
+    <div class="container py-5">
+        <div class="text-center mb-3 pb-3">
+            <h6 class="text-primary text-uppercase" style="letter-spacing: 5px;">Admin</h6>
+            <h1>Top Destination Bookings</h1>
+        </div>
+        <div class="row">
+            {% if bookings %}
+                {% for booking in bookings %}
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="package-item bg-white p-4 mb-4 shadow rounded">
+                        <div class="d-flex justify-content-between mb-3">
+                            <small><i class="fa fa-user text-primary mr-2"></i> {{ booking.user.username }}</small>
+                            <small><i class="fa fa-calendar-alt text-primary mr-2"></i> {{ booking.travel_date }}</small>
+                        </div>
+                        <h5 class="mb-3">{{ booking.topdestination.title }}</h5>
+                        <div class="d-flex justify-content-between mb-3">
+                            <small><i class="fa fa-map-marker-alt text-primary mr-2"></i> {{ booking.topdestination.location }}</small>
+                            <small><i class="fa fa-users text-primary mr-2"></i> {{ booking.number_of_people }} People</small>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3">
+                            <h6 class="m-0"><i class="fa fa-check text-primary mr-2"></i>Status: {{ booking.status|title }}</h6>
+                            <h5 class="m-0">${{ booking.total_price }}</h5>
+                        </div>
+                        {% if booking.special_requests %}
+                        <div class="mb-3">
+                            <small class="text-muted">Special Requests: {{ booking.special_requests }}</small>
+                        </div>
+                        {% endif %}
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'bookings:admin_topdestination_booking_update' booking.id %}" class="btn btn-sm btn-primary">Update Status</a>
+                            <a href="{% url 'bookings:admin_topdestination_booking_delete' booking.id %}" class="btn btn-sm btn-danger">Delete</a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="col-12 text-center">
+                    <p class="text-muted">No top destination bookings found.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

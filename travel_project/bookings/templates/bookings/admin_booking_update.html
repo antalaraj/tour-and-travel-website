@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-edit me-2"></i>Booking Details
+                    </h3>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                    <div class="messages mb-4">
+                        {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h5 class="border-bottom pb-2">User Information</h5>
+                            <p><strong>Name:</strong> {{ booking.user.get_full_name }}</p>
+                            <p><strong>Email:</strong> {{ booking.user.email }}</p>
+                            <p><strong>Phone:</strong> {{ booking.user.profile.phone|default:"Not provided" }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5 class="border-bottom pb-2">Package Information</h5>
+                            <p><strong>Package:</strong> {{ booking.package.name }}</p>
+                            <p><strong>Price:</strong> ₹{{ booking.package.price }}</p>
+                            <p><strong>Duration:</strong> {{ booking.package.duration }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h5 class="border-bottom pb-2">Booking Details</h5>
+                            <p><strong>Travelers:</strong> {{ booking.travelers }}</p>
+                            <p><strong>Total Amount:</strong> ₹{{ booking.total_amount }}</p>
+                            <p><strong>Travel Date:</strong> {{ booking.travel_date|date:"F d, Y" }}</p>
+                            <p><strong>Booking Date:</strong> {{ booking.created_at|date:"F d, Y" }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5 class="border-bottom pb-2">Special Requests</h5>
+                            <p>{{ booking.special_requests|default:"No special requests" }}</p>
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <h5 class="border-bottom pb-2">Status Management</h5>
+                            <form method="post">
+                                {% csrf_token %}
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="status" class="form-label">Booking Status</label>
+                                        <select class="form-select" id="status" name="status">
+                                            {% for value, label in status_choices %}
+                                            <option value="{{ value }}" {% if booking.status == value %}selected{% endif %}>
+                                                {{ label }}
+                                            </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="payment_status" class="form-label">Payment Status</label>
+                                        <select class="form-select" id="payment_status" name="payment_status">
+                                            {% for value, label in payment_status_choices %}
+                                            <option value="{{ value }}" {% if booking.payment_status == value %}selected{% endif %}>
+                                                {{ label }}
+                                            </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save"></i> Update Status
+                                    </button>
+                                    <a href="{% url 'bookings:admin_booking_list' %}" class="btn btn-secondary">
+                                        <i class="fas fa-arrow-left"></i> Back to List
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

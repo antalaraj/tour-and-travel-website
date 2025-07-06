@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <h1>{{ package.name }}</h1>
+            <p class="lead">{{ package.description }}</p>
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Package Details</h5>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item"><strong>Price:</strong> ${{ package.price }}</li>
+                        <li class="list-group-item"><strong>Duration:</strong> {{ package.duration }}</li>
+                        <li class="list-group-item"><strong>Available Seats:</strong> {{ package.available_seats }}</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Book This Package</h5>
+                    {% if user.is_authenticated %}
+                        <form method="post" action="{% url 'bookings:create_booking' package.pk %}">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label for="number_of_people" class="form-label">Number of People</label>
+                                <input type="number" class="form-control" id="number_of_people" name="number_of_people" min="1" max="{{ package.available_seats }}" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">Book Now</button>
+                        </form>
+                    {% else %}
+                        <p class="text-center">Please <a href="{% url 'login' %}">login</a> to book this package.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

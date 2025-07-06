@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ destination.title }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="position-relative">
+                {% if destination.img %}
+                    <img src="{{ destination.img.url }}" class="img-fluid rounded" alt="{{ destination.title }}">
+                {% else %}
+                    <div class="text-center py-5 bg-light rounded">
+                        <p class="text-muted">No image available</p>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="mt-4">
+                <h1 class="mb-3">{{ destination.title }}</h1>
+                <div class="d-flex align-items-center mb-3">
+                    <i class="fa fa-map-marker-alt text-primary me-2"></i>
+                    <span>{{ destination.location }}</span>
+                </div>
+                <div class="mb-4">
+                    <h5>Description</h5>
+                    <p>{{ destination.description }}</p>
+                </div>
+                {% if destination.tags %}
+                <div class="mb-4">
+                    <h5>Tags</h5>
+                    <div class="d-flex flex-wrap gap-2">
+                        {% for tag in destination.tags %}
+                            <span class="badge bg-primary">{{ tag }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Quick Info</h5>
+                    <div class="mb-3">
+                        <i class="fa fa-star text-warning me-2"></i>
+                        <span>Rating: {{ destination.rating }}/5</span>
+                    </div>
+                    <div class="mb-3">
+                        <i class="fa fa-calendar text-primary me-2"></i>
+                        <span>Created: {{ destination.created_at|date:"F d, Y" }}</span>
+                    </div>
+                    <div class="mb-3">
+                        <i class="fa fa-clock text-primary me-2"></i>
+                        <span>Last Updated: {{ destination.updated_at|date:"F d, Y" }}</span>
+                    </div>
+                    <a href="{% url 'destination' %}" class="btn btn-primary w-100">
+                        <i class="fa fa-arrow-left me-2"></i>Back to Destinations
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

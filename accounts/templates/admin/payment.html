@@ -1,0 +1,11 @@
+<form action="/payment-success/" method="POST">
+    <script src="https://checkout.razorpay.com/v1/checkout.js"
+        data-key="{{ payment.id }}"
+        data-amount="{{ payment.amount }}"
+        data-currency="INR"
+        data-order_id="{{ payment.id }}"
+        data-buttontext="Pay Now"
+        data-name="Tour Booking"
+        data-description="Complete your payment"
+        data-theme.color="#F37254"></script>
+</form>

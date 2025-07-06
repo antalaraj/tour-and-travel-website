@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Available Travel Packages</h1>
+    <div class="row">
+        {% for package in packages %}
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">{{ package.name }}</h5>
+                    <p class="card-text">{{ package.description|truncatewords:30 }}</p>
+                    <p class="card-text"><strong>Price:</strong> ${{ package.price }}</p>
+                    <p class="card-text"><strong>Duration:</strong> {{ package.duration }}</p>
+                    <p class="card-text"><strong>Available Seats:</strong> {{ package.available_seats }}</p>
+                    <a href="{% url 'bookings:package_detail' package.pk %}" class="btn btn-primary">View Details</a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <p>No travel packages available at the moment.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %} 

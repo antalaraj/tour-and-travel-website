@@ -1,0 +1,638 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8">
+            {% if destination.img %}
+                <img src="{{ destination.img.url }}" alt="{{ destination.name }}" class="img-fluid rounded shadow">
+            {% else %}
+                <div class="alert alert-warning">No image available</div>
+            {% endif %}
+            
+            <h1 class="mt-4">{{ destination.name }}</h1>
+            <p class="lead">{{ destination.description }}</p>
+            
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h5><i class="fas fa-clock text-primary"></i> Duration</h5>
+                            <p class="mb-0">{{ destination.duration }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h5><i class="fas fa-users text-primary"></i> Persons</h5>
+                            <p class="mb-0">{{ destination.persons }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h5><i class="fas fa-star text-primary"></i> Rating</h5>
+                            <p class="mb-0">{{ destination.rating }}/5.0</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h5><i class="fas fa-rupee-sign text-primary"></i> Price</h5>
+                            <p class="mb-0">₹{{ destination.price }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Trip Planning Roadmap Section -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="card shadow roadmap-card">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-route me-2"></i>Trip Planning Roadmap
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            {% if destination.trip_roadmap %}
+                                <div class="trip-roadmap">
+                                    <div class="roadmap-content">
+                                        {{ destination.trip_roadmap|linebreaks|safe }}
+                                    </div>
+                                    <div class="roadmap-toggle">
+                                        <button class="btn btn-link read-more-btn" onclick="toggleReadMore(this)">
+                                            Read More <i class="fas fa-chevron-down"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            {% else %}
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    No trip roadmap available for this destination.
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Booking Form Section -->
+        <div class="col-md-4">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-calendar-check me-2"></i>Book This Package
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{% url 'bookings:payment' destination.id %}" id="bookingForm">
+                        {% csrf_token %}
+                        <input type="hidden" name="destination_id" value="{{ destination.id }}">
+                        
+                        <!-- Travel Date -->
+                        <div class="travel-date-section mb-3">
+                            <label for="travel_date" class="form-label">
+                                <i class="fas fa-calendar-alt me-2"></i>Travel Date
+                            </label>
+                            <input type="date" class="form-control" id="travel_date" name="travel_date" required>
+                            <small class="text-muted">Select a future date for your travel</small>
+                        </div>
+
+                        <!-- Number of Travelers -->
+                        <div class="travelers-section mb-3">
+                            <label for="travelers" class="form-label">
+                                <i class="fas fa-users me-2"></i>Number of Travelers
+                            </label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="travelers" name="travelers" 
+                                       min="1" max="{{ destination.persons }}" value="1" required>
+                                <span class="input-group-text">
+                                    <i class="fas fa-user-friends"></i>
+                                </span>
+                            </div>
+                            <small class="text-muted">Maximum {{ destination.persons }} travelers allowed</small>
+                        </div>
+
+                        <!-- Travel Guide Selection -->
+                        <div class="travel-guide-section">
+                            <label for="travel_guide" class="form-label">
+                                <i class="fas fa-user-tie me-2"></i>Select Travel Guide
+                            </label>
+                            <select class="form-select" id="travel_guide" name="travel_guide" required>
+                                <option value="">Choose a Travel Guide...</option>
+                                {% for guide in travel_guides %}
+                                    <option value="{{ guide.id }}" data-designation="{{ guide.designation }}">
+                                        {{ guide.name }} - {{ guide.designation }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            <div id="selected-guide-info" class="mt-3 d-none">
+                                <div class="selected-guide-info">
+                                    <div class="d-flex align-items-center">
+                                        <div class="guide-avatar">
+                                            <i class="fas fa-user"></i>
+                                        </div>
+                                        <div class="guide-details">
+                                            <div class="guide-name"></div>
+                                            <div class="guide-designation"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Special Requests -->
+                        <div class="special-requests-section mb-3">
+                            <label for="special_requests" class="form-label">
+                                <i class="fas fa-comment-alt me-2"></i>Special Requests
+                            </label>
+                            <div class="input-group">
+                                <textarea class="form-control" id="special_requests" name="special_requests" 
+                                          rows="3" placeholder="Any special requirements or requests..."></textarea>
+                                <span class="input-group-text">
+                                    <i class="fas fa-pen"></i>
+                                </span>
+                            </div>
+                            <small class="text-muted">Let us know if you have any specific requirements</small>
+                        </div>
+
+                        <!-- Booking Summary -->
+                        <div class="booking-summary mb-3">
+                            <h6 class="border-bottom pb-2">Booking Summary</h6>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Base Price:</span>
+                                <span>₹{{ destination.price }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Number of Travelers:</span>
+                                <span id="summaryTravelers">1</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Total Amount:</span>
+                                <span id="totalAmount" class="text-primary fw-bold">₹{{ destination.price }}</span>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-check-circle me-2"></i>Proceed to Payment
+                        </button>
+                    </form>
+
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function() {
+                            const travelersInput = document.getElementById('travelers');
+                            const summaryTravelers = document.getElementById('summaryTravelers');
+                            const totalAmount = document.getElementById('totalAmount');
+                            const basePrice = parseFloat('{{ destination.price }}');
+                            const travelGuideSelect = document.getElementById('travel_guide');
+                            const selectedGuideInfo = document.getElementById('selected-guide-info');
+                            const guideName = selectedGuideInfo.querySelector('.guide-name');
+                            const guideDesignation = selectedGuideInfo.querySelector('.guide-designation');
+                            const travelDateInput = document.getElementById('travel_date');
+
+                            // Set today's date as default and minimum date
+                            const today = new Date();
+                            const tomorrow = new Date(today);
+                            tomorrow.setDate(tomorrow.getDate() + 1); // Set to tomorrow
+                            
+                            // Format dates for input
+                            const todayFormatted = today.toISOString().split('T')[0];
+                            const tomorrowFormatted = tomorrow.toISOString().split('T')[0];
+                            
+                            // Set default and minimum date
+                            travelDateInput.value = tomorrowFormatted;
+                            travelDateInput.min = tomorrowFormatted;
+
+                            // Handle travelers input
+                            travelersInput.addEventListener('input', function() {
+                                const travelers = parseInt(this.value) || 1;
+                                summaryTravelers.textContent = travelers;
+                                totalAmount.textContent = '₹' + (basePrice * travelers).toFixed(2);
+                            });
+
+                            // Handle travel guide selection
+                            travelGuideSelect.addEventListener('change', function() {
+                                const selectedOption = this.options[this.selectedIndex];
+                                if (selectedOption.value) {
+                                    guideName.textContent = selectedOption.text.split(' - ')[0];
+                                    guideDesignation.textContent = selectedOption.getAttribute('data-designation');
+                                    selectedGuideInfo.classList.remove('d-none');
+                                } else {
+                                    selectedGuideInfo.classList.add('d-none');
+                                }
+                            });
+                        });
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        border: none;
+        transition: transform 0.2s;
+    }
+    
+    .card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .shadow-sm {
+        box-shadow: 0 .125rem .25rem rgba(0,0,0,.075)!important;
+    }
+    
+    .shadow {
+        box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+    }
+
+    /* Enhanced Travel Guide Selection Styling */
+    .travel-guide-section {
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        border: 1px solid rgba(0,0,0,0.05);
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .travel-guide-section:hover {
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        transform: translateY(-2px);
+    }
+
+    .travel-guide-section .form-label {
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 0.75rem;
+        font-size: 1.1rem;
+    }
+
+    .travel-guide-section .form-select {
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background-color: white;
+        cursor: pointer;
+        width: 100%;
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 1rem center;
+        background-size: 1em;
+    }
+
+    .travel-guide-section .form-select:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+        outline: none;
+    }
+
+    .travel-guide-section .form-select option {
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+        background-color: white;
+    }
+
+    .selected-guide-info {
+        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        padding: 1.25rem;
+        margin-top: 1rem;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .selected-guide-info:hover {
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    }
+
+    .guide-avatar {
+        width: 48px;
+        height: 48px;
+        background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        box-shadow: 0 3px 10px rgba(13, 110, 253, 0.2);
+    }
+
+    .guide-avatar i {
+        font-size: 1.5rem;
+        color: white;
+    }
+
+    .guide-details {
+        flex: 1;
+    }
+
+    .guide-name {
+        font-weight: 600;
+        color: #2c3e50;
+        font-size: 1.1rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .guide-designation {
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+
+    /* Responsive adjustments for different screen sizes */
+    @media (min-width: 1200px) {
+        .travel-guide-section {
+            padding: 2rem;
+        }
+        
+        .guide-avatar {
+            width: 56px;
+            height: 56px;
+        }
+        
+        .guide-name {
+            font-size: 1.2rem;
+        }
+    }
+
+    @media (max-width: 1199px) and (min-width: 992px) {
+        .travel-guide-section {
+            padding: 1.75rem;
+        }
+        
+        .guide-avatar {
+            width: 52px;
+            height: 52px;
+        }
+    }
+
+    @media (max-width: 991px) and (min-width: 768px) {
+        .travel-guide-section {
+            padding: 1.5rem;
+        }
+        
+        .guide-avatar {
+            width: 48px;
+            height: 48px;
+        }
+    }
+
+    @media (max-width: 767px) {
+        .travel-guide-section {
+            padding: 1.25rem;
+        }
+        
+        .guide-avatar {
+            width: 44px;
+            height: 44px;
+        }
+        
+        .guide-name {
+            font-size: 1rem;
+        }
+        
+        .guide-designation {
+            font-size: 0.85rem;
+        }
+    }
+
+    /* Hover effects for better interactivity */
+    .travel-guide-section .form-select:hover {
+        border-color: #0d6efd;
+    }
+
+    .travel-guide-section .form-select option:hover {
+        background-color: #f8f9fa;
+    }
+
+    /* Focus states for accessibility */
+    .travel-guide-section .form-select:focus-visible {
+        outline: 2px solid #0d6efd;
+        outline-offset: 2px;
+    }
+
+    /* Loading state */
+    .travel-guide-section.loading .form-select {
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3ccircle cx='12' cy='12' r='10'%3e%3c/circle%3e%3cpath d='M12 6v6l4 2'%3e%3c/path%3e%3c/svg%3e");
+        background-size: 1.2em;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    /* Travel Date Section Styling */
+    .travel-date-section {
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        padding: 1.5rem;
+        border: 1px solid rgba(0,0,0,0.05);
+        transition: all 0.3s ease;
+    }
+
+    .travel-date-section:hover {
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        transform: translateY(-2px);
+    }
+
+    .travel-date-section .form-label {
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 0.75rem;
+    }
+
+    .travel-date-section .form-control {
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .travel-date-section .form-control:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+    }
+
+    .travel-date-section small {
+        display: block;
+        margin-top: 0.5rem;
+        color: #6c757d;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .travel-date-section {
+            padding: 1rem;
+        }
+    }
+
+    /* Travelers Section Styling */
+    .travelers-section {
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        padding: 1.5rem;
+        border: 1px solid rgba(0,0,0,0.05);
+        transition: all 0.3s ease;
+    }
+
+    .travelers-section:hover {
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        transform: translateY(-2px);
+    }
+
+    .travelers-section .form-label {
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 0.75rem;
+    }
+
+    .travelers-section .input-group {
+        margin-bottom: 0.5rem;
+    }
+
+    .travelers-section .form-control {
+        border: 2px solid #e9ecef;
+        border-radius: 8px 0 0 8px;
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .travelers-section .input-group-text {
+        background-color: #fff;
+        border: 2px solid #e9ecef;
+        border-left: none;
+        border-radius: 0 8px 8px 0;
+        color: #6c757d;
+        transition: all 0.3s ease;
+    }
+
+    .travelers-section .form-control:focus,
+    .travelers-section .form-control:focus + .input-group-text {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+    }
+
+    .travelers-section small {
+        display: block;
+        margin-top: 0.5rem;
+        color: #6c757d;
+    }
+
+    /* Special Requests Section Styling */
+    .special-requests-section {
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        padding: 1.5rem;
+        border: 1px solid rgba(0,0,0,0.05);
+        transition: all 0.3s ease;
+    }
+
+    .special-requests-section:hover {
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        transform: translateY(-2px);
+    }
+
+    .special-requests-section .form-label {
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 0.75rem;
+    }
+
+    .special-requests-section .input-group {
+        margin-bottom: 0.5rem;
+    }
+
+    .special-requests-section .form-control {
+        border: 2px solid #e9ecef;
+        border-radius: 8px 0 0 8px;
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        resize: vertical;
+        min-height: 100px;
+    }
+
+    .special-requests-section .input-group-text {
+        background-color: #fff;
+        border: 2px solid #e9ecef;
+        border-left: none;
+        border-radius: 0 8px 8px 0;
+        color: #6c757d;
+        transition: all 0.3s ease;
+        align-items: flex-start;
+        padding-top: 0.75rem;
+    }
+
+    .special-requests-section .form-control:focus,
+    .special-requests-section .form-control:focus + .input-group-text {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+    }
+
+    .special-requests-section small {
+        display: block;
+        margin-top: 0.5rem;
+        color: #6c757d;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .travelers-section,
+        .special-requests-section {
+            padding: 1rem;
+        }
+
+        .travelers-section .form-control,
+        .special-requests-section .form-control {
+            font-size: 0.9rem;
+            padding: 0.5rem 0.75rem;
+        }
+
+        .special-requests-section .form-control {
+            min-height: 80px;
+        }
+    }
+</style>
+
+{% block extra_js %}
+<script>
+function toggleReadMore(button) {
+    const content = button.closest('.trip-roadmap').querySelector('.roadmap-content');
+    const isExpanded = content.classList.contains('expanded');
+    
+    if (isExpanded) {
+        content.classList.remove('expanded');
+        button.innerHTML = 'Read More <i class="fas fa-chevron-down"></i>';
+        button.classList.remove('expanded');
+    } else {
+        content.classList.add('expanded');
+        button.innerHTML = 'Read Less <i class="fas fa-chevron-up"></i>';
+        button.classList.add('expanded');
+    }
+}
+</script>
+{% endblock %}
+{% endblock %}

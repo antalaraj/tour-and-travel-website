@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid py-5">
+    <div class="container">
+        <div class="row">
+            <!-- Package Image -->
+            <div class="col-lg-8">
+                <div class="position-relative">
+                    {% if destination.img %}
+                    <img class="img-fluid w-100 rounded" src="{{ destination.img.url }}" alt="{{ destination.name }}">
+                    {% else %}
+                    <div class="bg-light d-flex align-items-center justify-content-center" style="height: 400px;">
+                        <span class="text-muted">No Image Available</span>
+                    </div>
+                    {% endif %}
+                    <div class="position-absolute top-0 end-0 p-3">
+                        <span class="badge bg-primary">{{ destination.rating }} <i class="fas fa-star"></i></span>
+                    </div>
+                </div>
+                
+                <!-- Package Details -->
+                <div class="bg-white p-4 rounded shadow mt-4">
+                    <h2 class="mb-4">{{ destination.name }}</h2>
+                    <div class="d-flex justify-content-between mb-4">
+                        <div>
+                            <span class="text-muted"><i class="fas fa-clock me-2"></i>{{ destination.duration }}</span>
+                            <span class="text-muted ms-3"><i class="fas fa-users me-2"></i>{{ destination.persons }} Persons</span>
+                        </div>
+                        <h4 class="text-primary">₹{{ destination.price }}</h4>
+                    </div>
+                    <p class="mb-4">{{ destination.description }}</p>
+                </div>
+            </div>
+
+            <!-- Booking Form -->
+            <div class="col-lg-4">
+                <div class="bg-light p-4 rounded shadow">
+                    <h4 class="mb-4">Book This Package</h4>
+                    
+                    {% if messages %}
+                    <div class="messages mb-4">
+                        {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <form method="post" id="bookingForm">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.travel_date.id_for_label }}" class="form-label">Travel Date</label>
+                            {{ form.travel_date }}
+                            {% if form.travel_date.errors %}
+                            <div class="text-danger">
+                                {{ form.travel_date.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.travelers.id_for_label }}" class="form-label">Number of Travelers</label>
+                            {{ form.travelers }}
+                            {% if form.travelers.errors %}
+                            <div class="text-danger">
+                                {{ form.travelers.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label>
+                                <input type="checkbox" name="add_to_travel_guide" class="me-2">
+                                Add to Travel Guide
+                            </label>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100">Book Now</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

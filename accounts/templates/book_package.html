@@ -1,0 +1,13 @@
+{% block content %}
+<h2>Book {{ Destination.name }}</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    
+    <label>
+        <input type="checkbox" name="add_to_travel_guide"> Add to Travel Guide
+    </label>
+
+    <button type="submit">Book Now</button>
+</form>
+{% endblock %}

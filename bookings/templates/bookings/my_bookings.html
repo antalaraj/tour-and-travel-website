@@ -1,0 +1,479 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid py-5">
+    <div class="container">
+        <!-- Header Section -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="page-header">
+                    <div class="header-content text-center">
+                        <div class="header-icon mb-4">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <h1 class="display-4 fw-bold text-primary mb-3">My Bookings</h1>
+                        <p class="lead text-muted mb-4">Manage and track your travel adventures</p>
+                        <div class="header-actions">
+                            <a href="{% url 'package' %}" class="btn btn-primary btn-lg">
+                                <i class="fas fa-plus me-3"></i>Book New Package
+                            </a>
+                        </div>
+                    </div>
+                    <div class="header-stats mt-4">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <div class="stat-card">
+                                    <div class="stat-icon">
+                                        <i class="fas fa-check-circle"></i>
+                                    </div>
+                                    <div class="stat-info">
+                                        <h3 class="stat-number">{{ bookings|length }}</h3>
+                                        <p class="stat-label">Total Bookings</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="stat-card">
+                                    <div class="stat-icon">
+                                        <i class="fas fa-clock"></i>
+                                    </div>
+                                    <div class="stat-info">
+                                        <h3 class="stat-number">{{ bookings|length }}</h3>
+                                        <p class="stat-label">Active Bookings</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="stat-card">
+                                    <div class="stat-icon">
+                                        <i class="fas fa-history"></i>
+                                    </div>
+                                    <div class="stat-info">
+                                        <h3 class="stat-number">{{ bookings|length }}</h3>
+                                        <p class="stat-label">Past Bookings</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% if messages %}
+            <div class="row mb-4">
+                <div class="col-12">
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm">
+                            <i class="fas fa-info-circle me-3"></i>{{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+
+        {% if bookings %}
+            <div class="row g-4">
+                {% for booking in bookings %}
+                <div class="col-lg-6">
+                    <div class="card booking-card h-100 shadow-sm">
+                        <div class="card-header bg-white border-0 pt-4">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="card-title mb-0 text-primary">{{ booking.package.name }}</h5>
+                                <div class="booking-status">
+                                    <span class="badge {% if booking.status == 'confirmed' %}bg-success{% elif booking.status == 'rejected' %}bg-danger{% else %}bg-warning{% endif %} rounded-pill px-3 py-2">
+                                        <i class="fas {% if booking.status == 'confirmed' %}fa-check-circle{% elif booking.status == 'rejected' %}fa-times-circle{% else %}fa-clock{% endif %} me-2"></i>
+                                        {{ booking.status|title }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="booking-info mb-4">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <div class="info-item">
+                                            <div class="icon-wrapper">
+                                                <i class="fas fa-users text-primary"></i>
+                                            </div>
+                                            <div class="info-content">
+                                                <span class="text-muted">Travelers:</span>
+                                                <strong>{{ booking.travelers }}</strong>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="info-item">
+                                            <div class="icon-wrapper">
+                                                <i class="fas fa-calendar-alt text-primary"></i>
+                                            </div>
+                                            <div class="info-content">
+                                                <span class="text-muted">Travel Date:</span>
+                                                <strong>{{ booking.travel_date|date:"F d, Y" }}</strong>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="info-item">
+                                            <div class="icon-wrapper">
+                                                <i class="fas fa-rupee-sign text-primary"></i>
+                                            </div>
+                                            <div class="info-content">
+                                                <span class="text-muted">Total Amount:</span>
+                                                <strong>₹{{ booking.total_amount }}</strong>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="info-item">
+                                            <div class="icon-wrapper">
+                                                <i class="fas fa-clock text-primary"></i>
+                                            </div>
+                                            <div class="info-content">
+                                                <span class="text-muted">Booked On:</span>
+                                                <strong>{{ booking.created_at|date:"F d, Y" }}</strong>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="info-item">
+                                            <div class="icon-wrapper">
+                                                <i class="fas fa-user-tie text-primary"></i>
+                                            </div>
+                                            <div class="info-content">
+                                                <span class="text-muted">Travel Guide:</span>
+                                                {% if booking.travel_guide %}
+                                                    <strong>{{ booking.travel_guide.name }}</strong>
+                                                    <small class="d-block text-muted">{{ booking.travel_guide.designation }}</small>
+                                                {% else %}
+                                                    <strong class="text-muted">Not assigned</strong>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {% if booking.special_requests %}
+                            <div class="special-requests p-4 bg-light rounded mb-4">
+                                <h6 class="mb-3 text-primary">
+                                    <i class="fas fa-comment-alt me-3"></i>Special Requests
+                                </h6>
+                                <p class="mb-0">{{ booking.special_requests }}</p>
+                            </div>
+                            {% endif %}
+
+                            <div class="payment-status mb-4">
+                                <div class="d-flex align-items-center">
+                                    <div class="icon-wrapper me-3">
+                                        <i class="fas fa-credit-card text-primary"></i>
+                                    </div>
+                                    <span class="text-muted me-3">Payment Status:</span>
+                                    <span class="badge {% if booking.payment_status == 'completed' %}bg-success{% elif booking.payment_status == 'failed' %}bg-danger{% else %}bg-warning{% endif %} rounded-pill px-3 py-2">
+                                        {{ booking.payment_status|title }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            {% if booking.status != 'confirmed' and booking.status != 'rejected' %}
+                            <div class="booking-actions">
+                                <a href="{% url 'bookings:user_booking_delete' booking.id %}" 
+                                   class="btn btn-outline-danger w-100" 
+                                   onclick="return confirm('Are you sure you want to cancel this booking?');">
+                                    <i class="fas fa-trash me-3"></i>Cancel Booking
+                                </a>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="row">
+                <div class="col-12">
+                    <div class="text-center py-5">
+                        <div class="empty-state mb-4">
+                            <i class="fas fa-calendar-times fa-4x text-muted mb-4"></i>
+                            <h3 class="text-muted mb-3">No Bookings Yet</h3>
+                            <p class="text-muted mb-4">You haven't made any bookings yet. Start your adventure today!</p>
+                            <a href="{% url 'package' %}" class="btn btn-primary btn-lg">
+                                <i class="fas fa-search me-3"></i>Explore Packages
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+.page-header {
+    padding: 3rem 0;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 20px;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+}
+
+.header-content {
+    padding: 0 2rem;
+}
+
+.header-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    box-shadow: 0 10px 20px rgba(13, 110, 253, 0.2);
+}
+
+.header-icon i {
+    font-size: 2.5rem;
+    color: white;
+}
+
+.header-actions {
+    margin-top: 2rem;
+}
+
+.header-actions .btn {
+    padding: 0.75rem 2rem;
+    border-radius: 50px;
+    box-shadow: 0 5px 15px rgba(13, 110, 253, 0.2);
+    transition: all 0.3s ease;
+}
+
+.header-actions .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(13, 110, 253, 0.3);
+}
+
+.header-stats {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(0,0,0,0.1);
+}
+
+.stat-card {
+    background: white;
+    border-radius: 15px;
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
+
+.stat-icon {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+}
+
+.stat-icon i {
+    font-size: 1.5rem;
+    color: white;
+}
+
+.stat-info {
+    flex: 1;
+}
+
+.stat-number {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #0d6efd;
+    margin: 0;
+    line-height: 1.2;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: #6c757d;
+    margin: 0;
+}
+
+.booking-card {
+    border: none;
+    border-radius: 15px;
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.booking-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.1) !important;
+}
+
+.card-header {
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    background: linear-gradient(to right, #ffffff, #f8f9fa);
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    font-size: 0.95rem;
+    padding: 0.75rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.info-item:hover {
+    background-color: #f8f9fa;
+}
+
+.icon-wrapper {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0,123,255,0.1);
+    border-radius: 50%;
+    margin-right: 1rem;
+}
+
+.info-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.info-content span {
+    font-size: 0.85rem;
+    margin-bottom: 0.25rem;
+}
+
+.info-content strong {
+    font-size: 1rem;
+}
+
+.badge {
+    font-weight: 500;
+    font-size: 0.85rem;
+    padding: 0.5rem 1rem;
+}
+
+.travel-guide-info, .special-requests {
+    background-color: #f8f9fa;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+.travel-guide-info:hover, .special-requests:hover {
+    background-color: #e9ecef;
+    transform: translateY(-2px);
+}
+
+.booking-actions {
+    margin-top: 1.5rem;
+}
+
+.btn-outline-danger {
+    border-width: 2px;
+    font-weight: 500;
+    padding: 0.75rem 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-danger:hover {
+    background-color: #dc3545;
+    color: white;
+    transform: translateY(-2px);
+}
+
+.empty-state {
+    padding: 4rem;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 15px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+}
+
+@media (max-width: 768px) {
+    .booking-card {
+        margin: 0 -15px;
+        border-radius: 0;
+    }
+    
+    .info-item {
+        font-size: 0.9rem;
+        padding: 0.5rem;
+    }
+
+    .icon-wrapper {
+        width: 28px;
+        height: 28px;
+        margin-right: 0.75rem;
+    }
+
+    .page-header {
+        padding: 2rem 0;
+    }
+
+    .header-content {
+        padding: 0 1rem;
+    }
+
+    .header-icon {
+        width: 60px;
+        height: 60px;
+    }
+
+    .header-icon i {
+        font-size: 2rem;
+    }
+
+    .stat-card {
+        padding: 1rem;
+    }
+
+    .stat-icon {
+        width: 40px;
+        height: 40px;
+    }
+
+    .stat-icon i {
+        font-size: 1.2rem;
+    }
+
+    .stat-number {
+        font-size: 1.2rem;
+    }
+}
+
+/* Animation for cards */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.booking-card {
+    animation: fadeInUp 0.5s ease-out;
+}
+</style>
+{% endblock %} 

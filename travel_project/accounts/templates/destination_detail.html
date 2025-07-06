@@ -1,0 +1,413 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8">
+            {% if destination.img %}
+                <img src="{{ destination.img.url }}" alt="{{ destination.name }}" class="img-fluid rounded shadow">
+            {% else %}
+                <div class="alert alert-warning">No image available</div>
+            {% endif %}
+            
+            <h1 class="mt-4">{{ destination.name }}</h1>
+            <p class="lead">{{ destination.description }}</p>
+            
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h5><i class="fas fa-clock text-primary"></i> Duration</h5>
+                            <p class="mb-0">{{ destination.duration }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h5><i class="fas fa-users text-primary"></i> Persons</h5>
+                            <p class="mb-0">{{ destination.persons }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h5><i class="fas fa-star text-primary"></i> Rating</h5>
+                            <p class="mb-0">{{ destination.rating }}/5.0</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h5><i class="fas fa-rupee-sign text-primary"></i> Price</h5>
+                            <p class="mb-0">₹{{ destination.price }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Trip Planning Roadmap Section -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="card shadow roadmap-card">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-route me-2"></i>Trip Planning Roadmap
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            {% if destination.trip_roadmap %}
+                                <div class="trip-roadmap">
+                                    <div class="roadmap-content">
+                                        {{ destination.trip_roadmap|linebreaks|safe }}
+                                    </div>
+                                    <div class="roadmap-toggle">
+                                        <button class="btn btn-link read-more-btn" onclick="toggleReadMore(this)">
+                                            Read More <i class="fas fa-chevron-down"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            {% else %}
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    No trip roadmap available for this destination.
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Booking Form Section -->
+        <div class="col-md-4">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-calendar-check me-2"></i>Book This Package
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{% url 'bookings:payment' destination.id %}" id="bookingForm">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="travel_date" class="form-label">Travel Date</label>
+                            <input type="date" class="form-control" id="travel_date" name="travel_date" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="travelers" class="form-label">Number of Travelers</label>
+                            <input type="number" class="form-control" id="travelers" name="travelers" 
+                                   min="1" max="{{ destination.persons }}" value="1" required>
+                            <small class="text-muted">Maximum {{ destination.persons }} travelers allowed</small>
+                        </div>
+                        <div class="mb-3">
+                            <label for="travel_guide" class="form-label">Select Travel Guide</label>
+                            <select class="form-select custom-select" id="travel_guide" name="travel_guide" required>
+                                <option value="" disabled selected>Choose your guide...</option>
+                                {% for guide in travel_guides %}
+                                    <option value="{{ guide.id }}" 
+                                            data-designation="{{ guide.designation }}">
+                                        {{ guide.name }} - {{ guide.designation }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="special_requests" class="form-label">Special Requests</label>
+                            <textarea class="form-control" id="special_requests" name="special_requests" 
+                                      rows="3" placeholder="Any special requirements or requests..."></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <div class="selected-guide-info d-none p-3 rounded">
+                                <div class="d-flex align-items-center">
+                                    <div class="guide-avatar bg-primary text-white rounded-circle me-3">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <div class="guide-details">
+                                        <div class="guide-name"></div>
+                                        <div class="guide-designation"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="booking-summary mb-3 d-none">
+                            <h6 class="border-bottom pb-2">Booking Summary</h6>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Base Price:</span>
+                                <span>₹{{ destination.price }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Number of Travelers:</span>
+                                <span id="summaryTravelers">1</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Total Amount:</span>
+                                <span id="totalAmount" class="text-primary fw-bold">₹{{ destination.price }}</span>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-check-circle me-2"></i>Proceed to Payment
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        border: none;
+        transition: transform 0.2s;
+    }
+    
+    .card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .shadow-sm {
+        box-shadow: 0 .125rem .25rem rgba(0,0,0,.075)!important;
+    }
+    
+    .shadow {
+        box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+    }
+
+    /* Enhanced Select Styling */
+    .select-wrapper {
+        position: relative;
+    }
+
+    .custom-select {
+        background-color: #fff;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        padding: 8px 12px;
+        width: 100%;
+        cursor: pointer;
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 1rem center;
+        background-size: 1em;
+        font-size: 0.9rem;
+        line-height: 1.5;
+        color: #495057;
+    }
+
+    .custom-select:focus {
+        border-color: #7AB730;
+        box-shadow: 0 0 0 0.2rem rgba(122, 183, 48, 0.25);
+        outline: none;
+    }
+
+    .selected-guide-info {
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+    }
+
+    .guide-avatar {
+        font-size: 1.5rem;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .guide-details {
+        line-height: 1.2;
+    }
+
+    .guide-name {
+        font-weight: 500;
+        color: #212529;
+    }
+
+    .guide-designation {
+        font-size: 0.85rem;
+        color: #6c757d;
+    }
+
+    /* Style for the select options */
+    .custom-select option {
+        padding: 8px 12px;
+        min-height: 1.2em;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .custom-select option:not(:first-child) {
+        border-top: 1px solid #dee2e6;
+    }
+
+    .trip-roadmap {
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .roadmap-content {
+        padding: 1.5rem;
+        line-height: 1.8;
+        color: #333;
+        font-size: 1.1rem;
+        max-height: 300px;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+    }
+
+    .roadmap-content.expanded {
+        max-height: none;
+    }
+
+    .roadmap-toggle {
+        text-align: center;
+        padding: 1rem;
+        background-color: #fff;
+        border-top: 1px solid #e9ecef;
+    }
+
+    .read-more-btn {
+        color: #7AB730;
+        text-decoration: none;
+        font-weight: 500;
+        padding: 0.5rem 1.5rem;
+        transition: all 0.3s ease;
+        border: 1px solid #7AB730;
+        border-radius: 25px;
+    }
+
+    .read-more-btn:hover {
+        color: #fff;
+        background-color: #7AB730;
+        text-decoration: none;
+    }
+
+    .read-more-btn i {
+        transition: transform 0.3s ease;
+        margin-left: 0.5rem;
+    }
+
+    .read-more-btn.expanded i {
+        transform: rotate(180deg);
+    }
+
+    .alert-info {
+        background-color: #f8f9fa;
+        border-color: #e9ecef;
+        color: #495057;
+        padding: 1.25rem;
+        border-radius: 10px;
+        margin: 0;
+    }
+
+    .alert-info i {
+        color: #7AB730;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .roadmap-card {
+            margin: 0 -15px;
+            border-radius: 0;
+        }
+        
+        .roadmap-content {
+            font-size: 1rem;
+            padding: 1rem;
+        }
+    }
+</style>
+
+{% block extra_js %}
+<script>
+function toggleReadMore(button) {
+    const content = button.closest('.trip-roadmap').querySelector('.roadmap-content');
+    const isExpanded = content.classList.contains('expanded');
+    
+    if (isExpanded) {
+        content.classList.remove('expanded');
+        button.innerHTML = 'Read More <i class="fas fa-chevron-down"></i>';
+        button.classList.remove('expanded');
+    } else {
+        content.classList.add('expanded');
+        button.innerHTML = 'Read Less <i class="fas fa-chevron-up"></i>';
+        button.classList.add('expanded');
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Set minimum date to today
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('travel_date').min = today;
+
+    // Optional: Set a default date (e.g., tomorrow)
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    document.getElementById('travel_date').value = tomorrow.toISOString().split('T')[0];
+
+    const select = document.getElementById('travel_guide');
+    const selectedGuideInfo = document.querySelector('.selected-guide-info');
+    const guideName = selectedGuideInfo.querySelector('.guide-name');
+    const guideDesignation = selectedGuideInfo.querySelector('.guide-designation');
+    const bookingSummary = document.querySelector('.booking-summary');
+    const travelersInput = document.getElementById('travelers');
+    const summaryTravelers = document.getElementById('summaryTravelers');
+    const totalAmount = document.getElementById('totalAmount');
+    const basePrice = parseFloat('{{ destination.price }}');
+
+    // Function to update the booking summary
+    function updateBookingSummary() {
+        const travelers = parseInt(travelersInput.value) || 1;
+        summaryTravelers.textContent = travelers;
+        totalAmount.textContent = '₹' + (basePrice * travelers).toFixed(2);
+        bookingSummary.classList.remove('d-none');
+    }
+
+    // Function to update the selected guide info
+    function updateSelectedGuide() {
+        const selectedOption = select.options[select.selectedIndex];
+        if (select.value) {
+            guideName.textContent = selectedOption.text.split(' - ')[0];
+            guideDesignation.textContent = selectedOption.text.split(' - ')[1];
+            selectedGuideInfo.classList.remove('d-none');
+        } else {
+            selectedGuideInfo.classList.add('d-none');
+        }
+    }
+
+    // Event listeners
+    select.addEventListener('change', updateSelectedGuide);
+    travelersInput.addEventListener('input', updateBookingSummary);
+
+    // Initialize if there's a pre-selected value
+    if (select.value) {
+        updateSelectedGuide();
+    }
+    updateBookingSummary();
+
+    // Add animation to roadmap content
+    const roadmapContent = document.querySelector('.roadmap-content');
+    if (roadmapContent) {
+        roadmapContent.style.opacity = '0';
+        roadmapContent.style.transform = 'translateY(20px)';
+        setTimeout(() => {
+            roadmapContent.style.transition = 'all 0.5s ease';
+            roadmapContent.style.opacity = '1';
+            roadmapContent.style.transform = 'translateY(0)';
+        }, 200);
+    }
+});
+</script>
+{% endblock %}
+{% endblock %}

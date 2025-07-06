@@ -1,0 +1,36 @@
+{% extends "admin/change_list.html" %}
+
+{% block content %}
+<style>
+    .button {
+        display: inline-block;
+        padding: 5px 10px;
+        background-color: #28a745;
+        color: white;
+        text-decoration: none;
+        border-radius: 3px;
+    }
+    .button:hover {
+        background-color: #218838;
+    }
+</style>
+
+{{ block.super }}
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll('.confirm-booking').forEach(function (btn) {
+            btn.addEventListener('click', function (e) {
+                e.preventDefault();
+                const url = this.getAttribute('href');
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    }
+                }).then(response => location.reload());
+            });
+        });
+    });
+</script>
+{% endblock %}

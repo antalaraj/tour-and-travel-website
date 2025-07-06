@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Book {{ package.name }}</h3>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="{{ form.travel_date.id_for_label }}" class="form-label">Travel Date</label>
+                            {{ form.travel_date }}
+                            {% if form.travel_date.errors %}
+                            <div class="text-danger">
+                                {{ form.travel_date.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="mb-3">
+                            <label for="{{ form.number_of_people.id_for_label }}" class="form-label">Number of People</label>
+                            {{ form.number_of_people }}
+                            {% if form.number_of_people.errors %}
+                            <div class="text-danger">
+                                {{ form.number_of_people.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="mb-3">
+                            <p class="text-muted">Total Price: $<span id="totalPrice">{{ package.price }}</span></p>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Submit Booking</button>
+                        <a href="{% url 'package_detail' package.pk %}" class="btn btn-secondary">Cancel</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const numberInput = document.querySelector('#{{ form.number_of_people.id_for_label }}');
+    const totalPriceSpan = document.querySelector('#totalPrice');
+    const packagePrice = {{ package.price }};
+
+    numberInput.addEventListener('input', function() {
+        const numberOfPeople = parseInt(this.value) || 0;
+        const totalPrice = packagePrice * numberOfPeople;
+        totalPriceSpan.textContent = totalPrice.toFixed(2);
+    });
+});
+</script>
+{% endblock %} 

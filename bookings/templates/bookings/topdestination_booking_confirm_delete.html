@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid py-5">
+    <div class="container py-5">
+        <div class="text-center mb-3 pb-3">
+            <h6 class="text-primary text-uppercase" style="letter-spacing: 5px;">Confirm</h6>
+            <h1>Delete Booking</h1>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="bg-white p-4 mb-4 shadow rounded">
+                    <div class="mb-4">
+                        <h5>Are you sure you want to delete this booking?</h5>
+                        <div class="d-flex justify-content-between mb-2">
+                            <small><i class="fa fa-user text-primary mr-2"></i> User: {{ object.user.username }}</small>
+                            <small><i class="fa fa-calendar-alt text-primary mr-2"></i> Date: {{ object.travel_date }}</small>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <small><i class="fa fa-map-marker-alt text-primary mr-2"></i> Destination: {{ object.topdestination.title }}</small>
+                            <small><i class="fa fa-users text-primary mr-2"></i> People: {{ object.number_of_people }}</small>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <small><i class="fa fa-check text-primary mr-2"></i> Status: {{ object.status|title }}</small>
+                            <small><i class="fa fa-dollar-sign text-primary mr-2"></i> Total: ${{ object.total_price }}</small>
+                        </div>
+                    </div>
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-danger">Yes, Delete</button>
+                            {% if request.user.is_staff %}
+                                <a href="{% url 'bookings:admin_topdestination_booking_list' %}" class="btn btn-secondary">Cancel</a>
+                            {% else %}
+                                <a href="{% url 'bookings:my_topdestination_bookings' %}" class="btn btn-secondary">Cancel</a>
+                            {% endif %}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

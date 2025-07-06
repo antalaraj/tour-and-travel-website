@@ -1,0 +1,21 @@
+<div class="container mt-5">
+    <div class="card shadow-lg p-4">
+        <h2 class="text-center">{{ blog.title }}</h2>
+
+        <!-- Blog Image -->
+        {% if blog.image %}
+            <div class="text-center mb-3">
+                <img src="{{ blog.image.url }}" alt="{{ blog.title }}" class="img-fluid rounded" style="max-width: 100%; height: auto;">
+            </div>
+        {% endif %}
+
+        <!-- Blog Content -->
+        <p class="lead">{{ blog.content }}</p>
+        <p class="text-muted"><strong>By:</strong> {{ blog.author }}</p>
+
+        <!-- Back Button -->
+        <div class="d-flex justify-content-start">
+            <a href="{% url 'blog' %}" class="btn btn-secondary">← Back to Blogs</a>
+        </div>
+    </div>
+</div>
