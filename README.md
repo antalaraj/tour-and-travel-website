@@ -153,25 +153,25 @@ tour-and-travel-website/
 ---
 ## 👀 Screenshots
 
+### Login Page
+
+![Login](SS/User/Login.png)
+
 ### Home Page
 
-![Home Page]()
+![Home Page](SS/User/Home_Page.png)
 
 ### Booking Module
 
-![Booking Module](SS/User/Home_Page.png)
+![Booking Module](SS/User/Booking_Page.png)
 
 ### Admin Dashboard
 
-![Admin Dashboard](screenshots/admin_dashboard.png)
+![Admin Dashboard](SS/Admin/Dashboard.png)
 
-### Guide Profiles
+### Blog Page
 
-![Guide Profiles](screenshots/guides.png)
-
-### Review System
-
-![Reviews](screenshots/reviews.png)
+![Blog Page](SS/User/Blog_Page.png)
 
 ---
 
